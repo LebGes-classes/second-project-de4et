@@ -1,0 +1,13 @@
+[ {
+  "name" : "amd rx 6600",
+  "price" : 26000.0,
+  "id" : 0
+}, {
+  "name" : "amd ryzen 5600",
+  "price" : 14000.0,
+  "id" : 1
+}, {
+  "name" : "LG UltraGear",
+  "price" : 16000.0,
+  "id" : 2
+} ]
