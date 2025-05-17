@@ -1,0 +1,43 @@
+[ {
+  "items" : [ {
+    "productID" : 0,
+    "currentPrice" : 31200,
+    "id" : 115
+  }, {
+    "productID" : 0,
+    "currentPrice" : 31200,
+    "id" : 116
+  }, {
+    "productID" : 0,
+    "currentPrice" : 31200,
+    "id" : 117
+  }, {
+    "productID" : 1,
+    "currentPrice" : 16800,
+    "id" : 123
+  }, {
+    "productID" : 1,
+    "currentPrice" : 16800,
+    "id" : 124
+  }, {
+    "productID" : 1,
+    "currentPrice" : 16800,
+    "id" : 125
+  }, {
+    "productID" : 2,
+    "currentPrice" : 19200,
+    "id" : 131
+  }, {
+    "productID" : 2,
+    "currentPrice" : 19200,
+    "id" : 132
+  }, {
+    "productID" : 2,
+    "currentPrice" : 19200,
+    "id" : 133
+  } ],
+  "budget" : 164000,
+  "initialBudget" : 500000,
+  "id" : 0,
+  "income" : -336000
+} ]

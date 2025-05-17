@@ -14,7 +14,12 @@ public class ItemManager {
 	}
 
 	public Item add(int productID) throws Exception {
-		return this.is.insert(productID);
+		Item item = this.is.insert(productID, pm.getPriceOfProduct(productID));
+		return item;
+	}
+
+	public Item get(int ID) throws Exception {
+		return this.is.get(ID);
 	}
 
 	public Item[] getAll() throws Exception {

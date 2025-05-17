@@ -1,6 +1,7 @@
 package com.example.storage.item;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.StringJoiner;
 import com.example.entities.Item;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 
 public class JSONItemStorage implements ItemStorage {
 	String path;
@@ -21,9 +23,23 @@ public class JSONItemStorage implements ItemStorage {
 	}
 
 	@Override
-	public Item insert(int productID) throws Exception {
+	public Item insert(int productID, int price) throws Exception {
+		updateArr();
 		Item item = new Item(arr.size(), productID);
+		item.setCurrentPrice(price);
 		this.arr.add(item);
+		writeArr();
+		return item;
+	}
+
+	@Override
+	public Item update(Item item) throws Exception {
+		updateArr();
+		for (int i = 0; i < arr.size(); i++) {
+			if (arr.get(i).getID() == item.getID()) {
+				arr.set(i, item);
+			}
+		}
 		writeArr();
 		return item;
 	}
@@ -54,7 +70,9 @@ public class JSONItemStorage implements ItemStorage {
 
 	private void updateArr() throws IOException {
 		ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-		this.arr = mapper.readValue(new File(this.path), new TypeReference<ArrayList<Item>>() {});
+		try {
+			this.arr = mapper.readValue(new File(this.path), new TypeReference<ArrayList<Item>>() {});
+		} catch (MismatchedInputException | FileNotFoundException e) {}
 	}
 
 	@Override

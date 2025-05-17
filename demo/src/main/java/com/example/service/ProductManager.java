@@ -18,7 +18,11 @@ public class ProductManager {
 		return this.ps.getAll();
 	}
 
-	public Product newProduct(String name, float price) throws Exception {
+	public int getPriceOfProduct(int ID) throws Exception {
+		return get(ID).getPrice();
+	}
+
+	public Product newProduct(String name, int price) throws Exception {
 		return this.ps.insert(name, price);
 	}
 }

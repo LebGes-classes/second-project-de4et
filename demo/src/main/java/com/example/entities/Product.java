@@ -3,12 +3,12 @@ package com.example.entities;
 public class Product {
 	int ID;
 	String name;
-	float price;
+	int price;
 
 	public Product() {
 	}
 
-	public Product(int ID, String name, float price) {
+	public Product(int ID, String name, int price) {
 		this.ID = ID;
 		this.name = name;
 		this.price = price;
@@ -20,7 +20,7 @@ public class Product {
 
 	@Override
 	public String toString() {
-		return String.format("[%d] %s - %f", ID, name, price);
+		return String.format("[%d] %s - %d", ID, name, price);
 	}
 
 	public void setID(int iD) {
@@ -35,11 +35,11 @@ public class Product {
 		this.name = name;
 	}
 
-	public float getPrice() {
+	public int getPrice() {
 		return price;
 	}
 
-	public void setPrice(float price) {
+	public void setPrice(int price) {
 		this.price = price;
 	}
 }

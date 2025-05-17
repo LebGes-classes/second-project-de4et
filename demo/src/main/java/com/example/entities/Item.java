@@ -3,6 +3,7 @@ package com.example.entities;
 public class Item {
 	int ID;
 	int productID;
+	int currentPrice;
 	// boolean sold;
 
 	public Item() {}
@@ -31,5 +32,13 @@ public class Item {
 
 	public void setProductID(int productID) {
 		this.productID = productID;
+	}
+
+	public int getCurrentPrice() {
+		return currentPrice;
+	}
+
+	public void setCurrentPrice(int price) {
+		this.currentPrice = price;
 	}
 }
