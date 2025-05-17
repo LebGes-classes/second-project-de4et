@@ -71,7 +71,6 @@ public class JSONWarehouseStorage implements WarehouseStorage {
 	@Override
 	public Warehouse[] getAll() throws Exception  {
 		updateArr();
-		System.out.println("length wh array " + arr.size());
 		return (Warehouse[]) this.arr.toArray(Warehouse[]::new);
 	}
 
