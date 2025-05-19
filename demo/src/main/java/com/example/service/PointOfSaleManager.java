@@ -1,5 +1,7 @@
 package com.example.service;
 
+import java.util.List;
+
 import com.example.entities.Employee;
 import com.example.entities.Item;
 import com.example.entities.PointOfSale;
@@ -15,8 +17,9 @@ public class PointOfSaleManager {
 	PointOfSaleStorage ps;
 	WarehouseManager wm;
 
-	public PointOfSaleManager(PointOfSaleStorage ps, WarehouseManager wm, ProductManager pm, ItemManager im) {
+	public PointOfSaleManager(PointOfSaleStorage ps, EmployeeManager em, WarehouseManager wm, ProductManager pm, ItemManager im) {
 		this.ps = ps;
+		this.em = em;
 		this.wm = wm;
 		this.pm = pm;
 		this.im = im;
@@ -26,6 +29,9 @@ public class PointOfSaleManager {
 		return this.ps.insert(initialBudget);
 	}
 
+	public List<Employee> getEmployees(int posID) throws Exception  {
+		return get(posID).getEmployees();
+	}
 
 	public void sellItem(int posID, int itemID) throws Exception {
 		PointOfSale pos = get(posID);
@@ -36,7 +42,7 @@ public class PointOfSaleManager {
 	public void addItem(int posID, int itemID) throws Exception {
 		PointOfSale pos = get(posID);
 		Item item = im.get(itemID);
-		pos.addItem(item);
+		pos.setBudget(pos.getBudget() - item.getCurrentPrice());
 		ps.update(pos);
 	}
 
@@ -87,6 +93,11 @@ public class PointOfSaleManager {
 		PointOfSale pos = get(posID);
 		pos.removeEmployee(employeeID);
 		ps.update(pos);
+	}
+
+	public List<Item> getItems(int posID) throws Exception {
+		PointOfSale pos = get(posID);
+		return pos.getItems();
 	}
 
 	public void close(int ID) throws Exception {

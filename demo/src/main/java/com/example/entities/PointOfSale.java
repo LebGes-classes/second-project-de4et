@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class PointOfSale {
 	int ID;
 	List<Item> items;
@@ -43,7 +45,11 @@ public class PointOfSale {
 
 	@Override
 	public String toString() {
-		return "PointOfSale [items=" + items + ", budget=" + budget + "]";
+		return "PointOfSale [id=" + ID + ", budget=" + budget + "]";
+	}
+
+	public String toAdvancedString() {
+		return "PointOfSale [id=" + ID + ", employees=" + employees + ", items=" + items + ", budget=" + budget + "]";
 	}
 
 	public void sellItem(int itemID) {
@@ -56,6 +62,7 @@ public class PointOfSale {
 		}
 	}
 
+	@JsonIgnore
 	public int getIncome() {
 		return budget - initialBudget;
 	}

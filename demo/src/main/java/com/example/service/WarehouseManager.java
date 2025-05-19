@@ -1,16 +1,21 @@
 package com.example.service;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.example.entities.Item;
+import com.example.entities.Product;
 import com.example.entities.Warehouse;
 import com.example.storage.warehouse.WarehouseStorage;
 
 public class WarehouseManager {
+	ProductManager pm;
 	WarehouseStorage ws;
 	ItemManager im;
 
-    public WarehouseManager(WarehouseStorage ws, ItemManager im) {
+    public WarehouseManager(ProductManager pm, WarehouseStorage ws, ItemManager im) {
+		this.pm = pm;
 		this.ws = ws;
 		this.im = im;
     }
@@ -44,9 +49,17 @@ public class WarehouseManager {
 		return warehouse.countFreeCells();
 	}
 
-	public HashMap<Integer, Integer> countAvailableProducts(int warehouseID) throws Exception {
+	public HashMap<Product, Integer> countAvailableProducts(int warehouseID) throws Exception {
 		Warehouse warehouse = get(warehouseID);
-		return warehouse.countAvailableProducts();
+		HashMap<Integer, Integer> res = warehouse.countAvailableProducts();
+		HashMap<Product, Integer> ans = new HashMap<>();
+
+		for (Map.Entry<Integer, Integer> pair : res.entrySet()) {
+			int productID = pair.getKey();
+			ans.put(pm.get(productID), pair.getValue());
+		}
+		
+		return ans;
 	}
 
 	public int getItemByProduct(int warehouseID, int productID) throws Exception {
@@ -74,6 +87,11 @@ public class WarehouseManager {
 
 		ws.update(from);
 		ws.update(to);
+	}
+
+	public List<Item> getAllItems(int warehouseID) throws Exception {
+		Warehouse wh = get(warehouseID);
+		return wh.getAllItems();
 	}
 
 	public void close(int warehouseID) throws Exception {

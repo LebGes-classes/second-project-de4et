@@ -14,7 +14,13 @@ public class Consumer {
 		boughtItems = new HashMap<>();
 	}
 	
+	@Override
+	public String toString() {
+		return "Consumer [ID=" + ID + ", name=" + name + ", boughtItems=" + boughtItems + "]";
+	}
+
 	public Consumer(int ID, String name) {
+		this();
 		this.ID = ID;
 		this.name = name;
 	}

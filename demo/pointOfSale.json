@@ -1,0 +1,11 @@
+[ {
+  "items" : [ {
+    "productID" : 0,
+    "currentPrice" : 31200,
+    "id" : 0
+  } ],
+  "employees" : [ ],
+  "budget" : 3200,
+  "initialBudget" : 50000,
+  "id" : 0
+} ]

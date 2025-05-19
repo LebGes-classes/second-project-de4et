@@ -1,9 +1,19 @@
 package com.example.ui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
+import com.example.entities.Consumer;
+import com.example.entities.Employee;
+import com.example.entities.Item;
 import com.example.entities.PointOfSale;
+import com.example.entities.Product;
 import com.example.entities.Warehouse;
+import com.example.exceptions.NoEnoughMoneyException;
+import com.example.service.ConsumerManager;
 import com.example.service.EmployeeManager;
 import com.example.service.ItemManager;
 import com.example.service.PointOfSaleManager;
@@ -16,16 +26,18 @@ public class ConsoleUI {
 	ItemManager im;
 	WarehouseManager wm;
 	PointOfSaleManager posm;
+	ConsumerManager cm;
 
 	Scanner sc; 
 
 	public ConsoleUI(ProductManager pm, EmployeeManager em, ItemManager im, WarehouseManager wm,
-			PointOfSaleManager posm) {
+			PointOfSaleManager posm, ConsumerManager cm) {
 		this.pm = pm;
 		this.em = em;
 		this.im = im;
 		this.wm = wm;
 		this.posm = posm;
+		this.cm = cm;
 
 		this.sc = new Scanner(System.in);
 	}
@@ -35,7 +47,7 @@ public class ConsoleUI {
 	}
 
 	void mainMenu() throws Exception {
-		System.out.println("Выберите действие:");
+		System.out.println("\nВыберите действие:");
 		System.out.println("1. Перемещение товаров");
 		System.out.println("2. Смена ответственного лица");
 		System.out.println("3. Продажа товара");
@@ -47,13 +59,16 @@ public class ConsoleUI {
 		System.out.println("9. Закрытие склада");
 		System.out.println("10. Открытие пункта продаж");
 		System.out.println("11. Закрытие пункта продаж");
-		System.out.println("12. Информация о складе/пункте продаж");
-		System.out.println("13. Информация о товарах на складе/пункте");
+		System.out.println("12. Информация о складе");
+		System.out.println("13. Информация о пункте");
 		System.out.println("14. Информация о товарах доступных к закупке");
-		System.out.println("15. Информация о доходности предприятия");
+		System.out.println("15. Информация о доходности пункте");
+		System.out.println("---------------------------------");
+		System.out.println("16. Зарегистрировать нового покупателя");
+		System.out.println("17. Создать продукт");
 		System.out.println("0. Выход из программы");
 
-		int choice = getIntegerInput(0, 15);
+		int choice = getIntegerInput(0, 17);
 
 		switch (choice) {
 			case 1 -> moveItemMenu();
@@ -67,10 +82,12 @@ public class ConsoleUI {
 			case 9 -> closeWarehouseMenu();
 			case 10 -> openSalesPointMenu();
 			case 11 -> closeSalesPointMenu();
-			case 12 -> showLocationInfoMenu();
-			case 13 -> showProductsInfoMenu();
+			case 12 -> showWarehouseInfoMenu();
+			case 13 -> showPointOfSaleInfoMenu();
 			case 14 -> showAvailableProductsMenu();
 			case 15 -> showProfitabilityMenu();
+			case 16 -> regNewConsumerMenu();
+			case 17 -> addNewProductMenu();
 			case 0 -> {
 				System.out.println("Выход");
 			}
@@ -80,38 +97,60 @@ public class ConsoleUI {
 	void moveItemMenu() throws Exception {
 		System.out.println("\nПеремещение товаров:");
 
-		System.out.println("\nВыберите склад");
+		System.out.println("\nВыберите склад 'c'");
 		int i = 1;
-		for (Warehouse wh: wm.getAll()) {
-			System.out.println(String.format("%d. %s", i, wh.toString()));
+		Warehouse[] all = wm.getAll();
+		for (Warehouse pos: all) {
+			System.out.println(String.format("%d. %s", i, pos.toString()));
 			i++;
 		}
 		System.out.println("0. Вернуться в главное меню");
 		
-		int choice = getIntegerInput(0, wm.getAll().length);
+		int choice = getIntegerInput(0, posm.getAll().length);
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
-		// int warehouseID = choice-1;
+		int warehouse1ID = all[(choice-1)].getID();
 		
-		System.out.println("\nВыберите склад-назначение:");
-		System.out.println("1. Склад В");
-		System.out.println("2. Склад Г");
+		System.out.println("\nВыберите предмет:");
+		i = 1;
+		List<Item> allItems = wm.getAllItems(warehouse1ID);
+		for (Item item: allItems) {
+			System.out.println(String.format("%d. %s", i, item.toString()));
+			i++;
+		}
 		System.out.println("0. Вернуться в главное меню");
-
-		choice = getIntegerInput(0, 2);
+		
+		choice = getIntegerInput(0, allItems.size());
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
+		int itemID = allItems.get((choice-1)).getID();
+
+		System.out.println("\nВыберите склад 'в'");
+		i = 1;
+		for (Warehouse pos: all) {
+			System.out.println(String.format("%d. %s", i, pos.toString()));
+			i++;
+		}
+		System.out.println("0. Вернуться в главное меню");
+		
+		choice = getIntegerInput(0, posm.getAll().length);
+		if (choice == 0) {
+			mainMenu();
+			return;
+		}
+		int warehouse2ID = all[(choice-1)].getID();
 		
 		System.out.println("\nПодтвердите перемещение:");
 		System.out.println("1. Да");
-		System.out.println("0. Нет (вернуться в главное меню)");
+		System.out.println("0. Вернуться в главное меню");
 
 		choice = getIntegerInput(0, 1);
 		if (choice == 1) {
+			wm.moveItem(itemID, warehouse2ID, warehouse2ID);
 			System.out.println("Товар успешно перемещен!");
 		}
 		mainMenu();
@@ -120,18 +159,19 @@ public class ConsoleUI {
 	void changeResponsiblePersonMenu() throws Exception {
 		System.out.println("\nВыберите склад:");
 		int i = 1;
-		for (Warehouse wh: wm.getAll()) {
-			System.out.println(String.format("%d. %s", i, wh.toString()));
+		Warehouse[] all = wm.getAll();
+		for (Warehouse pos: all) {
+			System.out.println(String.format("%d. %s", i, pos.toString()));
 			i++;
 		}
 		System.out.println("0. Вернуться в главное меню");
-
-		int choice = getIntegerInput(0, wm.getAll().length);
+		
+		int choice = getIntegerInput(0, posm.getAll().length);
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
-		int warehouseID = choice-1;
+		int warehouseID = all[(choice-1)].getID();
 		
 		System.out.println("\nВведите нового ответственного:");
 		System.out.println("0. Вернуться в главное меню");
@@ -144,7 +184,7 @@ public class ConsoleUI {
 		
 		System.out.println("\nПодтвердите изменение:");
 		System.out.println("1. Да");
-		System.out.println("0. Нет (вернуться в главное меню)");
+		System.out.println("0. Вернуться в главное меню");
 
 		choice = getIntegerInput(0, 1);
 		if (choice == 1) {
@@ -155,129 +195,184 @@ public class ConsoleUI {
 	}
 
 	void sellProductMenu() throws Exception {
-		System.out.println("\nВыберите пункт продаж:");
-		System.out.println("1. Пункт А");
-		System.out.println("2. Пункт Б");
+		System.out.println("\nВыберите покупателя:");
+		int i = 1;
+		Consumer[] allCustomers = cm.getAll();
+		for (Consumer cons: allCustomers) {
+			System.out.println(String.format("%d. %s", i, cons.toString()));
+			i++;
+		}
 		System.out.println("0. Вернуться в главное меню");
-
-		int choice = getIntegerInput(0, 2);
+		
+		int choice = getIntegerInput(0, cm.getAll().length);
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
+		int customerID = allCustomers[(choice-1)].getID();
+
+		System.out.println("\nВыберите пункт продаж:");
+		i = 1;
+		PointOfSale[] allPOS = posm.getAll();
+		for (PointOfSale pos: allPOS) {
+			System.out.println(String.format("%d. %s", i, pos.toString()));
+			i++;
+		}
+		System.out.println("0. Вернуться в главное меню");
+		
+		choice = getIntegerInput(0, posm.getAll().length);
+		if (choice == 0) {
+			mainMenu();
+			return;
+		}
+		int posID = allPOS[(choice-1)].getID();
 		
 		System.out.println("\nВыберите товар:");
-		System.out.println("1. Товар 1");
-		System.out.println("2. Товар 2");
+		i = 1;
+		List<Item> allItems = posm.getItems(posID);
+		for (Item item: allItems) {
+			System.out.println(String.format("%d. %s", i, item.toString()));
+			i++;
+		}
 		System.out.println("0. Вернуться в главное меню");
-
-		choice = getIntegerInput(0, 2);
+		
+		choice = getIntegerInput(0, allItems.size());
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
-		
-		System.out.println("\nВведите количество:");
-		System.out.println("0. Вернуться в главное меню");
-		
-		int quantity = getIntegerInput(0, Integer.MAX_VALUE);
-		if (quantity == 0) {
-			mainMenu();
-			return;
-		}
+		int itemID = allItems.get((choice-1)).getID();
 		
 		System.out.println("\nПодтвердите продажу:");
 		System.out.println("1. Да");
-		System.out.println("0. Нет (вернуться в главное меню)");
+		System.out.println("0. Вернуться в главное меню");
 
 		choice = getIntegerInput(0, 1);
 		if (choice == 1) {
+			cm.buyItem(customerID, itemID, posID);
 			System.out.println("Продажа успешно оформлена!");
 		}
 		mainMenu();
 	}
 
 	void returnProductMenu() throws Exception {
-		System.out.println("\nВведите номер чека:");
+		System.out.println("\nВыберите покупателя:");
+		int i = 1;
+		Consumer[] allConsumers = cm.getAll();
+		for (Consumer cons: allConsumers) {
+			System.out.println(String.format("%d. %s", i, cons.toString()));
+			i++;
+		}
 		System.out.println("0. Вернуться в главное меню");
 		
-		int receiptNumber = getIntegerInput(0, Integer.MAX_VALUE);
-		if (receiptNumber == 0) {
+		int choice = getIntegerInput(0, cm.getAll().length);
+		if (choice == 0) {
 			mainMenu();
 			return;
 		}
-		
+		int consumerID = allConsumers[(choice-1)].getID();
+
 		System.out.println("\nВыберите товар для возврата:");
-		System.out.println("1. Товар 1");
-		System.out.println("2. Товар 2");
-		System.out.println("0. Вернуться в главное меню");
-
-		int choice = getIntegerInput(0, 2);
-		if (choice == 0) {
-			mainMenu();
-			return;
+		i = 1;
+		HashMap<Item, Integer> boughtItems = cm.getBoughtItems(consumerID);
+		List<Item> allItems = new ArrayList<>();
+		allItems.addAll(boughtItems.keySet());
+		for (Item item: allItems) {
+			System.out.println(String.format("%d. %s", i, item.toString()));
+			i++;
 		}
+		System.out.println("0. Вернуться в главное меню");
 		
-		System.out.println("\nУкажите причину возврата:");
-		System.out.println("1. Брак");
-		System.out.println("2. Не подошел");
-		System.out.println("0. Вернуться в главное меню");
-
-		choice = getIntegerInput(0, 2);
+		choice = getIntegerInput(0, allItems.size());
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
+		int itemID = allItems.get((choice-1)).getID();
 		
 		System.out.println("\nПодтвердите возврат:");
 		System.out.println("1. Да");
-		System.out.println("0. Нет (вернуться в главное меню)");
+		System.out.println("0. Вернуться в главное меню");
 
 		choice = getIntegerInput(0, 1);
 		if (choice == 1) {
+			cm.returnItem(consumerID, itemID);
 			System.out.println("Возврат успешно оформлен!");
 		}
 		mainMenu();
 	}
 
 	void purchaseProductMenu() throws Exception {
-		System.out.println("\nВыберите поставщика:");
-		System.out.println("1. Поставщик 1");
-		System.out.println("2. Поставщик 2");
+		System.out.println("\nВыберите склад для закупки:");
+		int i = 1;
+		Warehouse[] all = wm.getAll();
+		for (Warehouse pos: all) {
+			System.out.println(String.format("%d. %s", i, pos.toString()));
+			i++;
+		}
 		System.out.println("0. Вернуться в главное меню");
-
-		int choice = getIntegerInput(0, 2);
+		
+		int choice = getIntegerInput(0, wm.getAll().length);
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
-		
-		System.out.println("\nВыберите товары:");
-		System.out.println("1. Товар А");
-		System.out.println("2. Товар Б");
-		System.out.println("0. Вернуться в главное меню");
+		int warehouseID = all[(choice-1)].getID();
 
-		choice = getIntegerInput(0, 2);
+		System.out.println("\nВыберите пункт продаж:");
+		i = 1;
+		PointOfSale[] allPOS = posm.getAll();
+		for (PointOfSale pos: allPOS) {
+			System.out.println(String.format("%d. %s", i, pos.toString()));
+			i++;
+		}
+		System.out.println("0. Вернуться в главное меню");
+		
+		choice = getIntegerInput(0, posm.getAll().length);
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
+		int posID = allPOS[(choice-1)].getID();
 		
-		System.out.println("\nВведите количество:");
+		System.out.println("\nВыберите продукт:");
+		i = 1;
+		Product[] products = pm.getAll();
+		for (Product prod: products) {
+			System.out.println(String.format("%d. %s", i, prod.toString()));
+			i++;
+		}
 		System.out.println("0. Вернуться в главное меню");
 		
-		int quantity = getIntegerInput(0, Integer.MAX_VALUE);
-		if (quantity == 0) {
+		choice = getIntegerInput(0, products.length);
+		if (choice == 0) {
 			mainMenu();
 			return;
 		}
+		int productID = products[choice-1].getID();
+
+		System.out.println("\nУкажите количество [1:" + wm.countProduct(warehouseID, productID) + "]:");
+		System.out.println("0. Вернуться в главное меню");
+		choice = getIntegerInput(0, wm.countProduct(warehouseID, productID));
+		if (choice == 0) {
+			mainMenu();
+			return;
+		}
+		int amount = choice;
 		
 		System.out.println("\nПодтвердите закупку:");
 		System.out.println("1. Да");
-		System.out.println("0. Нет (вернуться в главное меню)");
+		System.out.println("0. Вернуться в главное меню");
 
 		choice = getIntegerInput(0, 1);
 		if (choice == 1) {
+			try {
+				posm.buyProduct(posID, productID, warehouseID, amount);
+			} catch (NoEnoughMoneyException e) {
+				System.out.println("Не хватает денег!");
+				mainMenu();
+				return;
+			}
 			System.out.println("Закупка успешно оформлена!");
 		}
 		mainMenu();
@@ -287,7 +382,8 @@ public class ConsoleUI {
 	void hireEmployeeMenu() throws Exception {
 		System.out.println("\nВыберите пункт продаж:");
 		int i = 1;
-		for (PointOfSale pos: posm.getAll()) {
+		PointOfSale[] all = posm.getAll();
+		for (PointOfSale pos: all) {
 			System.out.println(String.format("%d. %s", i, pos.toString()));
 			i++;
 		}
@@ -298,7 +394,7 @@ public class ConsoleUI {
 			mainMenu();
 			return;
 		}
-		int posID = choice-1;
+		int posID = all[(choice-1)].getID();
 
 		System.out.println("\nВведите имя нового сотрудника:");
 		System.out.println("0. Вернуться в главное меню");
@@ -340,9 +436,10 @@ public class ConsoleUI {
 	}
 
 	void fireEmployeeMenu() throws Exception {
-		System.out.println("\nВыберите пункт продаж для закрытия:");
+		System.out.println("\nВыберите пункт продаж:");
 		int i = 1;
-		for (PointOfSale pos: posm.getAll()) {
+		PointOfSale[] all = posm.getAll();
+		for (PointOfSale pos: all) {
 			System.out.println(String.format("%d. %s", i, pos.toString()));
 			i++;
 		}
@@ -353,23 +450,30 @@ public class ConsoleUI {
 			mainMenu();
 			return;
 		}
-		int posID = choice-1;
+		int posID = all[(choice-1)].getID();
 
 		System.out.println("\nВыберите сотрудника:");
+		List<Employee> employees = posm.getEmployees(posID);
+		i = 1;
+		for (Employee e: employees) {
+			System.out.println(String.format("%d. %s", i++, e.toString()));
+		}
 		System.out.println("0. Вернуться в главное меню");
 		
 		choice = this.sc.nextInt();
-		if (choice == ) {
+		if (choice == 0) {
 			mainMenu();
 			return;
 		}
+		int employeeID = employees.get(choice-1).getID();
 		
 		System.out.println("\nПодтвердите увольнение:");
 		System.out.println("1. Да");
-		System.out.println("0. Нет (вернуться в главное меню)");
+		System.out.println("0. Вернуться в главное меню");
 
 		choice = getIntegerInput(0, 1);
 		if (choice == 1) {
+			posm.fire(posID, employeeID);
 			System.out.println("Сотрудник успешно уволен!");
 		}
 		mainMenu();
@@ -391,7 +495,13 @@ public class ConsoleUI {
 
 		int choice = getIntegerInput(0, 1);
 		if (choice == 1) {
-			wm.newWarehouse(amount, em.add("Ivan", "boss", 50000).getID());
+			Warehouse wh = wm.newWarehouse(amount, em.add("Ivan", "boss", 50000).getID());
+
+			for (Product prod: pm.getAll()) {
+				for (int i = 0; i < 10 && wh.countFreeCells() > 0; i++) {
+					wm.addItem(wh.getID(), im.add(prod.getID()).getID());
+				}
+			}
 			System.out.println("Склад успешно открыт!");
 		}
 		
@@ -401,18 +511,19 @@ public class ConsoleUI {
 	void closeWarehouseMenu() throws Exception {
 		System.out.println("\nВыберите склад для закрытия:");
 		int i = 1;
-		for (Warehouse wh: wm.getAll()) {
-			System.out.println(String.format("%d. %s", i, wh.toString()));
+		Warehouse[] all = wm.getAll();
+		for (Warehouse pos: all) {
+			System.out.println(String.format("%d. %s", i, pos.toString()));
 			i++;
 		}
 		System.out.println("0. Вернуться в главное меню");
-
+		
 		int choice = getIntegerInput(0, wm.getAll().length);
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
-		int warehouseID = choice-1;
+		int warehouseID = all[(choice-1)].getID();
 		
 		System.out.println("\nПодтвердите закрытие:");
 		System.out.println("1. Да");
@@ -427,185 +538,200 @@ public class ConsoleUI {
 	}
 
 	void openSalesPointMenu() throws Exception {
-		System.out.println("\nВведите адрес пункта продаж:");
+		System.out.println("\nВведите начальный бюджет:");
 		System.out.println("0. Вернуться в главное меню");
 		
-		String address = scanner.nextLine();
-		if (address.equals("0")) {
-			mainMenu();
-			return;
-		}
-		
-		System.out.println("\nВыберите тип пункта:");
-		System.out.println("1. Розничный");
-		System.out.println("2. Оптовый");
-		System.out.println("0. Вернуться в главное меню");
-
-		int choice = getIntegerInput(0, 2);
-		if (choice == 0) {
+		int initialBudget = sc.nextInt();
+		if (initialBudget == 0) {
 			mainMenu();
 			return;
 		}
 		
 		System.out.println("\nПодтвердите открытие:");
 		System.out.println("1. Да");
-		System.out.println("0. Нет (вернуться в главное меню)");
+		System.out.println("0. Вернуться в главное меню");
 
-		choice = getIntegerInput(0, 1);
+		int choice = getIntegerInput(0, 1);
 		if (choice == 1) {
+			posm.newPointOfSale(initialBudget);
 			System.out.println("Пункт продаж успешно открыт!");
 		}
 		mainMenu();
 	}
 
 	void closeSalesPointMenu() throws Exception {
-		System.out.println("\nВыберите пункт продаж для закрытия:");
-		System.out.println("1. Пункт А");
-		System.out.println("2. Пункт Б");
-		System.out.println("0. Вернуться в главное меню");
-
-		int choice = getIntegerInput(0, 2);
-		if (choice == 0) {
-			mainMenu();
-			return;
+		System.out.println("\nВыберите пункт продаж:");
+		int i = 1;
+		PointOfSale[] all = posm.getAll();
+		for (PointOfSale pos: all) {
+			System.out.println(String.format("%d. %s", i, pos.toString()));
+			i++;
 		}
+		System.out.println("0. Вернуться в главное меню");
 		
-		System.out.println("\nУкажите причину закрытия:");
-		System.out.println("1. Нерентабельность");
-		System.out.println("2. Окончание аренды");
-		System.out.println("0. Вернуться в главное меню");
-
-		choice = getIntegerInput(0, 2);
+		int choice = getIntegerInput(0, posm.getAll().length);
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
+		int posID = all[(choice-1)].getID();
 		
 		System.out.println("\nПодтвердите закрытие:");
 		System.out.println("1. Да");
-		System.out.println("0. Нет (вернуться в главное меню)");
+		System.out.println("0. Вернуться в главное меню");
 
 		choice = getIntegerInput(0, 1);
 		if (choice == 1) {
+			posm.close(posID);
 			System.out.println("Пункт продаж успешно закрыт!");
 		}
 		mainMenu();
 	}
 
-	void showLocationInfoMenu() throws Exception {
-		System.out.println("\nВыберите объект для просмотра:");
-		System.out.println("1. Склад А");
-		System.out.println("2. Пункт продаж Б");
+	void showWarehouseInfoMenu() throws Exception {
+		System.out.println("\nВыберите склад");
+		int i = 1;
+		Warehouse[] all = wm.getAll();
+		for (Warehouse pos: all) {
+			System.out.println(String.format("%d. %s", i, pos.toString()));
+			i++;
+		}
 		System.out.println("0. Вернуться в главное меню");
-
-		int choice = getIntegerInput(0, 2);
+		
+		int choice = getIntegerInput(0, wm.getAll().length);
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
+		int warehouseID = all[(choice-1)].getID();
 		
-		System.out.println("\nИнформация об объекте:");
-		System.out.println("Адрес: ул. Примерная, 123");
-		System.out.println("Ответственный: Иванов И.И.");
-		System.out.println("Статус: Активен");
-		
-		System.out.println("\n1. Обновить информацию");
-		System.out.println("0. Вернуться в главное меню");
-
-		choice = getIntegerInput(0, 1);
-		if (choice == 1) {
-			showLocationInfoMenu(); 
-		} else {
-			mainMenu();
-		}
+		System.out.println("\nИнформация об пункте:");
+		System.out.println(wm.get(warehouseID).toAdvancedString());
+		mainMenu();
 	}
 
-	void showProductsInfoMenu() throws Exception {
-		System.out.println("\nВыберите объект для просмотра товаров:");
-		System.out.println("1. Склад А");
-		System.out.println("2. Пункт продаж Б");
+	void showPointOfSaleInfoMenu() throws Exception {
+		System.out.println("\nВыберите пункт продаж:");
+		int i = 1;
+		PointOfSale[] all = posm.getAll();
+		for (PointOfSale pos: all) {
+			System.out.println(String.format("%d. %s", i, pos.toString()));
+			i++;
+		}
 		System.out.println("0. Вернуться в главное меню");
-
-		int choice = getIntegerInput(0, 2);
+		
+		int choice = getIntegerInput(0, posm.getAll().length);
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
+		int posID = all[(choice-1)].getID();
 		
-		System.out.println("\nСписок товаров:");
-		System.out.println("1. Товар 1 - 50 шт.");
-		System.out.println("2. Товар 2 - 30 шт.");
-		
-		System.out.println("\n1. Обновить список");
-		System.out.println("0. Вернуться в главное меню");
-
-		choice = getIntegerInput(0, 1);
-		if (choice == 1) {
-			showProductsInfoMenu(); 
-		} else {
-			mainMenu();
-		}
+		System.out.println(posm.get(posID).toAdvancedString());
+		mainMenu();
 	}
 
 	void showAvailableProductsMenu() throws Exception {
-		System.out.println("\nДоступные для закупки товары:");
-		System.out.println("1. Товар А - от 100 руб./шт.");
-		System.out.println("2. Товар Б - от 150 руб./шт.");
-		System.out.println("3. Товар В - от 200 руб./шт.");
+		System.out.println("\nВыберите склад");
+		int i = 1;
+		Warehouse[] all = wm.getAll();
+		for (Warehouse pos: all) {
+			System.out.println(String.format("%d. %s", i, pos.toString()));
+			i++;
+		}
 		System.out.println("0. Вернуться в главное меню");
-
-		int choice = getIntegerInput(0, 3);
+		
+		int choice = getIntegerInput(0, wm.getAll().length);
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
-		
-		System.out.println("\nИнформация о товаре:");
-		System.out.println("Минимальная партия: 10 шт.");
-		System.out.println("Срок поставки: 3-5 дней");
-		
-		System.out.println("\n1. Вернуться к списку");
-		System.out.println("0. Вернуться в главное меню");
+		int warehouseID = all[(choice-1)].getID();
 
-		choice = getIntegerInput(0, 1);
-		if (choice == 1) {
-			showAvailableProductsMenu();
-		} else {
-			mainMenu();
+		System.out.println("\nДоступные для закупки товары:");
+		for (Map.Entry<Product, Integer> pair : wm.countAvailableProducts(warehouseID).entrySet()) {
+			System.out.println(pair.getKey() + ": " + pair.getValue());
 		}
+
+		mainMenu();
 	}
 
 	void showProfitabilityMenu() throws Exception {
-		System.out.println("\nВыберите период для отчета:");
-		System.out.println("1. За день");
-		System.out.println("2. За неделю");
-		System.out.println("3. За месяц");
+		System.out.println("\nВыберите пункт продаж:");
+		int i = 1;
+		PointOfSale[] all = posm.getAll();
+		for (PointOfSale pos: all) {
+			System.out.println(String.format("%d. %s", i, pos.toString()));
+			i++;
+		}
 		System.out.println("0. Вернуться в главное меню");
-
-		int choice = getIntegerInput(0, 3);
+		
+		int choice = getIntegerInput(0, posm.getAll().length);
 		if (choice == 0) {
 			mainMenu();
 			return;
 		}
-		
+		int posID = all[(choice-1)].getID();
+
+		PointOfSale pos = posm.get(posID);
 		System.out.println("\nОтчет о доходности:");
-		System.out.println("Доход: 50 000 руб.");
-		System.out.println("Расходы: 30 000 руб.");
-		System.out.println("Прибыль: 20 000 руб.");
+		System.out.println("Изначальный бюджет: " + pos.getInitialBudget());
+		System.out.println("Текущий бюджет: " + pos.getBudget());
+		System.out.println("Доход: " + posm.getIncome(posID));
 		
-		System.out.println("\n1. Сформировать другой отчет");
-		System.out.println("2. Экспортировать в файл");
+		mainMenu();
+	}
+
+	void regNewConsumerMenu() throws Exception {
+		System.out.println("\nВведите имя нового покупателя:");
+		System.out.println("0. Вернуться в главное меню");
+		
+		String name = this.sc.nextLine();
+		if (name.equals("0")) {
+			mainMenu();
+			return;
+		}
+
+		System.out.println("\nПодтвердите регистрацию:");
+		System.out.println("1. Да");
 		System.out.println("0. Вернуться в главное меню");
 
-		choice = getIntegerInput(0, 2);
-		switch (choice) {
-			case 1 -> showProfitabilityMenu();
-			case 2 -> {
-				System.out.println("Отчет успешно экспортирован!");
-				mainMenu();
-			}
-			case 0 -> mainMenu();
+		int choice = getIntegerInput(0, 1);
+		if (choice == 1) {
+			cm.add(name);
+			System.out.println("Пользователь успешно зарегистрирован!");
 		}
+		mainMenu();
+	}
+
+	void addNewProductMenu() throws Exception {
+		System.out.println("\nВведите название продукта:");
+		System.out.println("0. Вернуться в главное меню");
+		
+		String name = this.sc.nextLine();
+		if (name.equals("0")) {
+			mainMenu();
+			return;
+		}
+
+		System.out.println("Введите цену продукта:");
+		System.out.println("0. Вернуться в главное меню");
+		int price = this.sc.nextInt();
+		if (price == 0) {
+			mainMenu();
+			return;
+		}
+		
+		System.out.println("\nПодтвердите создание:");
+		System.out.println("1. Да");
+		System.out.println("0. Вернуться в главное меню");
+
+		int choice = getIntegerInput(0, 1);
+		if (choice == 1) {
+			pm.newProduct(name, price);
+			System.out.println("Продукт успешно создан!");
+		}
+		mainMenu();
 	}
 
 	private int getIntegerInput(int min, int max) {

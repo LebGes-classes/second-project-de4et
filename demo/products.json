@@ -1,17 +1,17 @@
-[
-  {
-    "name": "amd rx 6600",
-    "price": 26000,
-    "id": 0
-  },
-  {
-    "name": "amd ryzen 5600",
-    "price": 14000,
-    "id": 1
-  },
-  {
-    "name": "LG UltraGear",
-    "price": 16000,
-    "id": 2
-  }
-]
+[ {
+  "name" : "amd rx 6600",
+  "price" : 26000,
+  "id" : 0
+}, {
+  "name" : "amd ryzen 5600",
+  "price" : 14000,
+  "id" : 1
+}, {
+  "name" : "LG UltraGear",
+  "price" : 16000,
+  "id" : 2
+}, {
+  "name" : "ak-47",
+  "price" : 100000,
+  "id" : 3
+} ]

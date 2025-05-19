@@ -81,11 +81,12 @@ public class JSONPointOfSaleStorage implements PointOfSaleStorage {
 		}
 	}
 
+	@SuppressWarnings("CallToPrintStackTrace")
 	private void updateArr() throws IOException {
 		ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
 		try {
 			this.arr = mapper.readValue(new File(this.path), new TypeReference<ArrayList<PointOfSale>>() {});
-		} catch (MismatchedInputException | FileNotFoundException e) {}
+		} catch (MismatchedInputException | FileNotFoundException e) { }
 	}
 
 	@Override

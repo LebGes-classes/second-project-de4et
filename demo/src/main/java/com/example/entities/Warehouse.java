@@ -1,7 +1,9 @@
 package com.example.entities;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import com.example.exceptions.NoEnoughSpaceException;
@@ -190,9 +192,26 @@ public class Warehouse {
 
 	@Override
 	public String toString() {
-		return "Warehouse [ID=" + ID + ", maxAmountOfCells=" + maxAmountOfCells + ", cells=" + Arrays.toString(cells)
+		return "Warehouse [ID=" + ID + ", maxAmountOfCells=" + maxAmountOfCells + "]";
+	}
+
+	public String toAdvancedString() {
+		return "Warehouse [ID=" + ID + ", maxAmountOfCells=" + ", responsible=" + responsibleID + maxAmountOfCells + ", cells=" + Arrays.toString(cells)
 				+ "]";
 	}
+
+	@JsonIgnore
+	public List<Item> getAllItems() {
+		List<Item> l = new ArrayList<>();
+
+		for (Cell cell: cells) {
+			if (cell.isFull()) {
+				l.add(cell.getItem());
+			}
+		}
+		return l;
+	}
+
 	public int getResponsibleID() {
 		return responsibleID;
 	}

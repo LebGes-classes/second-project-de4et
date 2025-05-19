@@ -1,14 +1,20 @@
 package com.example.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.example.entities.Consumer;
+import com.example.entities.Item;
 import com.example.storage.consumer.ConsumerStorage;
 
 public class ConsumerManager {
+	ItemManager im;
 	PointOfSaleManager pm;
 	ConsumerStorage cs;
 
-	public ConsumerManager(ConsumerStorage cs, PointOfSaleManager pm) {
+	public ConsumerManager(ConsumerStorage cs, ItemManager im, PointOfSaleManager pm) {
 		this.cs = cs;
+		this.im = im;
 		this.pm = pm;
 	}
 
@@ -37,5 +43,17 @@ public class ConsumerManager {
 		pm.addItem(consumer.getPOSIDOfBoughtItem(itemID), itemID);
 		consumer.removeBoughtItem(itemID);
 		this.cs.update(consumer);
+	}
+
+	public HashMap<Item, Integer> getBoughtItems(int consumerID) throws Exception {
+		Consumer consumer = get(consumerID);
+		HashMap<Integer, Integer> res = consumer.getBoughtItems();
+		HashMap<Item, Integer> ans = new HashMap<>();
+		for (Map.Entry<Integer, Integer> en : res.entrySet()) {
+			Integer key = en.getKey();
+			Integer val = en.getValue();
+			ans.put(im.get(key), val);
+		}
+		return ans;
 	}
 }

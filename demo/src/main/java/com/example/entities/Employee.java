@@ -37,5 +37,10 @@ public class Employee {
 	}
 	public void setSalary(int salary) {
 		this.salary = salary;
+	}
+	
+	@Override
+	public String toString() {
+		return "Employee [ID=" + ID + ", name=" + name + ", position=" + position + ", salary=" + salary + "]";
 	} 
 }

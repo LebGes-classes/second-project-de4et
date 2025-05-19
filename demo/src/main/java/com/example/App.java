@@ -2,11 +2,14 @@ package com.example;
 
 import java.util.Random;
 
+import com.example.service.ConsumerManager;
 import com.example.service.EmployeeManager;
 import com.example.service.ItemManager;
 import com.example.service.PointOfSaleManager;
 import com.example.service.ProductManager;
 import com.example.service.WarehouseManager;
+import com.example.storage.consumer.ConsumerStorage;
+import com.example.storage.consumer.JSONConsumerStorage;
 import com.example.storage.employee.EmployeeStorage;
 import com.example.storage.employee.JSONEmployeeStorage;
 import com.example.storage.item.ItemStorage;
@@ -71,16 +74,18 @@ public class App {
         
         EmployeeStorage employeeStorage = new JSONEmployeeStorage("employee.json");
         EmployeeManager em = new EmployeeManager(employeeStorage);
+        System.out.println(em);
 
         WarehouseStorage warehouseStorage = new JSONWarehouseStorage("warehouse.json");
-        WarehouseManager wm = new WarehouseManager(warehouseStorage, im);
-        // Warehouse warehouse = wm.newWarehouse(100, em.add("Vladik", "bossEbatel'", 300 * 89).getID());
+        WarehouseManager wm = new WarehouseManager(pm, warehouseStorage, im);
 
         PointOfSaleStorage pointOfSaleStorage = new JSONPointOfSaleStorage("pointOfSale.json");
-        PointOfSaleManager posm = new PointOfSaleManager(pointOfSaleStorage, wm, pm, im);
-        // PointOfSale pointOfSale = posm.newPointOfSale(500000);
+        PointOfSaleManager posm = new PointOfSaleManager(pointOfSaleStorage, em, wm, pm, im);
 
-        ConsoleUI ui = new ConsoleUI(pm, em, im, wm, posm);
+        ConsumerStorage consumerStorage = new JSONConsumerStorage("consumers.json");
+        ConsumerManager cm = new ConsumerManager(consumerStorage, im, posm);
+
+        ConsoleUI ui = new ConsoleUI(pm, em, im, wm, posm, cm);
         ui.run();
     }
 }

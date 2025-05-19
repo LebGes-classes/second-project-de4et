@@ -4,18 +4,8 @@
   "salary" : 50000,
   "id" : 0
 }, {
-  "name" : "Lena",
+  "name" : "magil",
   "position" : "boss",
-  "salary" : 45000,
+  "salary" : 50000,
   "id" : 1
-}, {
-  "name" : "Anna",
-  "position" : "boss",
-  "salary" : 90000,
-  "id" : 2
-}, {
-  "name" : "Maxim",
-  "position" : "boss",
-  "salary" : 37000,
-  "id" : 3
 } ]
