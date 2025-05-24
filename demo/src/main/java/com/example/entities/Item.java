@@ -4,7 +4,6 @@ public class Item {
 	int ID;
 	int productID;
 	int currentPrice;
-	// boolean sold;
 
 	public Item() {}
 	

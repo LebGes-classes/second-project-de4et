@@ -2,9 +2,13 @@
   "responsibleID" : 1,
   "maxAmountOfCells" : 10,
   "cells" : [ {
-    "item" : null,
+    "item" : {
+      "productID" : 0,
+      "currentPrice" : 26000,
+      "id" : 4
+    },
     "id" : 0,
-    "full" : false
+    "full" : true
   }, {
     "item" : {
       "productID" : 0,

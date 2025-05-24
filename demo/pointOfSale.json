@@ -1,11 +1,12 @@
 [ {
-  "items" : [ {
-    "productID" : 0,
-    "currentPrice" : 31200,
-    "id" : 0
+  "items" : [ ],
+  "employees" : [ {
+    "name" : "vlaDICK",
+    "position" : "fuck slaves",
+    "salary" : 300,
+    "id" : 2
   } ],
-  "employees" : [ ],
-  "budget" : 3200,
+  "budget" : 34400,
   "initialBudget" : 50000,
   "id" : 0
 } ]

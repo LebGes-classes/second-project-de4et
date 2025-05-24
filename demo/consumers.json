@@ -1,5 +1,7 @@
 [ {
   "name" : "timur",
-  "boughtItems" : { },
+  "boughtItems" : {
+    "0" : 0
+  },
   "id" : 0
 } ]

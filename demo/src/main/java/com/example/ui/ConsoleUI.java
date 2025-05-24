@@ -231,7 +231,8 @@ public class ConsoleUI {
 		i = 1;
 		List<Item> allItems = posm.getItems(posID);
 		for (Item item: allItems) {
-			System.out.println(String.format("%d. %s", i, item.toString()));
+			String s = String.format("%s", pm.get(item.getProductID()).toString());
+			System.out.println(String.format("%d. %s", i, s));
 			i++;
 		}
 		System.out.println("0. Вернуться в главное меню");
